@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_pokemon
+    description: ""
+    columns:
+      - name: pokemon_id
+        tests:
+          - unique
+          - not_null
+      - name: pokemon_name
+        tests:
+          - not_null
+      - name: primary_type
+        tests:
+          - not_null

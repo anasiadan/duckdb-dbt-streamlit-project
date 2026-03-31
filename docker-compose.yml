@@ -1,0 +1,41 @@
+
+services:
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    command: python ingest/fetch_data.py
+
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+      - ./dbt_project:/app/dbt_project
+    working_dir: /app/dbt_project
+    environment:
+      - DUCKDB_PATH=/app/data/pokemon.duckdb
+    command: sh -c "dbt run --profiles-dir /app/dbt_project && dbt test --profiles-dir /app/dbt_project"
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+      - ./streamlit_app:/app/streamlit_app
+    working_dir: /app
+    environment:
+      - DUCKDB_PATH=/app/data/pokemon.duckdb
+    command: streamlit run streamlit_app/app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    depends_on:
+      dbt:
+        condition: service_completed_successfully

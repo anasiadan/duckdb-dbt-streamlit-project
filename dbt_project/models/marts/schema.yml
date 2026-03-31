@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: fct_pokemon
+    description: "Core fact table with one row per Pokémon, including base stats and physical attributes."
+    columns:
+      - name: pokemon_id
+        description: "Unique Pokémon identifier."
+        tests:
+          - unique
+          - not_null
+      - name: pokemon_name
+        description: "Pokémon name."
+        tests:
+          - not_null
+      - name: primary_type
+        description: "Primary type."
+      - name: total_base_stats
+        description: "Sum of HP, attack, defense and speed."
+      - name: weight_kg
+        description: "Weight in kilograms."
+      - name: height_m
+        description: "Height in meters."
+
+  - name: dim_type
+    description: "Dimension table with one row per type, including aggregated stats across all Pokémon of that type."
+    columns:
+      - name: primary_type
+        description: "Pokémon type name."
+        tests:
+          - unique
+          - not_null
+      - name: pokemon_count
+        description: "Number of Pokémon with this type."
+      - name: avg_total_stats
+        description: "Average total base stats for this type."
